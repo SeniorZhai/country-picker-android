@@ -1,6 +1,7 @@
 package com.mukesh.countrypicker;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -246,6 +247,19 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
       return getCountry(countryIsoCode);
     }
     return afghanistan();
+  }
+
+  @Nullable
+  public Country getCountryByDialCode(String dialCode) {
+    getAllCountries();
+    for (int i = 0; i < countriesList.size(); i++) {
+      Country country = countriesList.get(i);
+      if (country.getDialCode().equals(dialCode)) {
+        country.setFlag(getFlagResId(country.getCode()));
+        return country;
+      }
+    }
+    return null;
   }
 
   private Country getCountry( String countryIsoCode ) {
