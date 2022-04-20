@@ -2,6 +2,8 @@ package com.mukeshsolanki.countrypickerexample;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -45,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
       }
     });
     getUserCountryInfo();
+
+    Country c1 = mCountryPicker.getCountryByDialCode("+1");
+    Country c2 = mCountryPicker.getCountryByDialCode("+44");
+    Country c3 = mCountryPicker.getCountryByDialCode("+86");
+    Country c4 = mCountryPicker.getCountryByDialCode("+7");
+    Log.d("@@@", "c1: "+ c1.getName() + ", c2: " + c2.getName() + ", c3: " + c3.getName() + ", c4: " + c4.getName());
   }
 
   private void initialize() {

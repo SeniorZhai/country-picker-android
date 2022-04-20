@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.ArrayMap;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +51,8 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   private View mHeader;
   private Context context;
   private EditText mSearchEditText;
+
+  private ArrayMap<String, Country> defaultCountryMap;
 
   public static CountryPicker newInstance() {
     return new CountryPicker();
@@ -181,10 +185,12 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     if (countriesList == null) {
       try {
         countriesList = new ArrayList<>();
+        defaultCountryMap = new ArrayMap<>();
         String allCountriesCode = readEncodedJsonString();
         JSONArray countryArray = new JSONArray(allCountriesCode);
         for (int i = 0; i < countryArray.length(); i++) {
           JSONObject jsonObject = countryArray.getJSONObject(i);
+          String countryName = jsonObject.getString("name");
           String countryDialCode = jsonObject.getString("dial_code");
           String countryCode = jsonObject.getString("code");
           Country country = new Country();
@@ -192,6 +198,10 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
           country.setDialCode(countryDialCode);
           country.setFlag(getFlagResId(countryCode));
           countriesList.add(country);
+
+          if (Constants.DEFAULT_TOP_LEVEL_COUNTRIES.contains(countryName)) {
+            defaultCountryMap.put(countryDialCode, country);
+          }
         }
         selectedCountriesList = new ArrayList<>();
         selectedCountriesList.addAll(countriesList);
@@ -225,7 +235,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     }
 
     Country c = getCountry(Locale.getDefault().getCountry());
-    return c != null ? c : afghanistan();
+    return c;
   }
 
   public Country getCountryByLocale( Context context, Locale locale ) {
@@ -252,8 +262,13 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   @Nullable
   public Country getCountryByDialCode(String dialCode) {
     getAllCountries();
+    Country country = defaultCountryMap.get(dialCode);
+    if (country != null) {
+      return country;
+    }
+
     for (int i = 0; i < countriesList.size(); i++) {
-      Country country = countriesList.get(i);
+      country = countriesList.get(i);
       if (country.getDialCode().equals(dialCode)) {
         country.setFlag(getFlagResId(country.getCode()));
         return country;
