@@ -1,80 +1,87 @@
+@file:JvmName("CountryAdapterKt")
+
 package com.mukesh.countrypicker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.ImageView
+import android.widget.SectionIndexer
 import android.widget.TextView
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import java.util.*
+import kotlin.collections.ArrayList
+class CountryAdapter(
+    private val countries: List<Country>,
+    private val onClickListener: (Country) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), SectionIndexer, StickyRecyclerHeadersAdapter<HeaderViewHolder> {
+    private val sectionPositions = ArrayList<Int>(26)
 
-class CountryAdapter(context: Context, private var countries: List<Country>) : BaseAdapter(), StickyListHeadersAdapter {
-  private var inflater: LayoutInflater = LayoutInflater.from(context)
-
-  override fun getCount(): Int = countries.size
-
-  override fun getItem(position: Int): Any = countries[position]
-
-  override fun getItemId(position: Int): Long = position.toLong()
-
-  override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-    val holder: ViewHolder
-    val view: View
-    if (convertView == null) {
-      holder = ViewHolder()
-      view = inflater.inflate(R.layout.item_normal, parent, false)
-      holder.text = view.findViewById(R.id.normal) as TextView
-      holder.icon = view.findViewById(R.id.icon) as ImageView
-      view.tag = holder
-    } else {
-      view = convertView
-      holder = view.tag as ViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return CountryHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_normal, parent, false))
     }
 
-    val drawableName = "flag_" + countries[position].code.toLowerCase(Locale.ENGLISH)
-    val drawableId = view.context.resIdByName(drawableName, "drawable")
-    if (drawableId != -1) {
-      holder.icon.setImageResource(drawableId)
+    override fun getHeaderId(position: Int): Long = countries[position].englishName[0].code.toLong()
+
+    override fun onCreateHeaderViewHolder(parent: ViewGroup): HeaderViewHolder {
+        return HeaderViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_header, parent, false))
     }
-    holder.text.text = countries[position].name
 
-    return view
-  }
-
-  override fun getHeaderView(position: Int, convertView: View?, parent: ViewGroup): View {
-    val view: View
-    val holder: HeaderViewHolder
-    if (convertView == null) {
-      holder = HeaderViewHolder()
-      view = inflater.inflate(R.layout.item_header, parent, false)
-      holder.text = view.findViewById(R.id.header) as TextView
-      view.tag = holder
-    } else {
-      view = convertView
-      holder = view.tag as HeaderViewHolder
+    override fun onBindHeaderViewHolder(holder: HeaderViewHolder, position: Int) {
+        countries[position].let { holder.bind(it) }
     }
-    val headerText = "" + countries[position].englishName[0]
-    holder.text.text = headerText
-    return view
-  }
 
-  override fun getHeaderId(position: Int): Long = countries[position].englishName[0].toLong()
+    override fun getItemCount() = countries.size
 
-  internal inner class HeaderViewHolder {
-    lateinit var text: TextView
-  }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is CountryHolder) {
+            countries[position].let { holder.bind(it, onClickListener) }
+        }
+    }
 
-  internal inner class ViewHolder {
-    lateinit var text: TextView
-    lateinit var icon: ImageView
-  }
+    override fun getSections(): Array<String> {
+        val sections = ArrayList<String>(26)
+        countries.forEachIndexed { i, c ->
+            val section = c.englishName[0].uppercaseChar().toString()
+            if (!sections.contains(section)) {
+                sections.add(section)
+                sectionPositions.add(i)
+            }
+        }
+        return sections.toTypedArray()
+    }
+
+    override fun getPositionForSection(sectionIndex: Int): Int = sectionPositions[sectionIndex]
+
+    override fun getSectionForPosition(position: Int): Int = 0
 }
 
+class CountryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    fun bind(country: Country, onClickListener: (Country) -> Unit) {
+        val drawableName = "flag_" + country.code.lowercase(Locale.ENGLISH)
+        val drawableId = itemView.context.resIdByName(drawableName, "drawable")
+        if (drawableId != -1) {
+            itemView.findViewById<ImageView>(R.id.icon).setImageResource(drawableId)
+        }
+        itemView.findViewById<TextView>(R.id.normal).text = country.name
+        itemView.findViewById<TextView>(R.id.code).text = country.dialCode
+        itemView.setOnClickListener { onClickListener.invoke(country) }
+    }
+}
+
+class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    fun bind(country: Country) {
+        itemView.findViewById<TextView>(R.id.header).text = country.englishName[0].toString()
+    }
+}
+
+@SuppressLint("DiscouragedApi")
 fun Context.resIdByName(resIdName: String?, resType: String): Int {
-  resIdName?.let {
-    return resources.getIdentifier(it, resType, packageName)
-  }
-  return -1
+    resIdName?.let {
+        return resources.getIdentifier(it, resType, packageName)
+    }
+    return -1
 }

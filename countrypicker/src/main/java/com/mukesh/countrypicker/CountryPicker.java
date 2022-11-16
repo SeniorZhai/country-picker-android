@@ -9,9 +9,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.telephony.TelephonyManager;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.util.Base64;
@@ -19,36 +20,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView;
 
+@SuppressWarnings("unused")
 public class CountryPicker extends Fragment implements View.OnClickListener {
 
-  private StickyListHeadersListView countryListView;
   private View closeView;
-  private TextView mSelectedTextView;
-  private ImageView mSelectedImageView;
-  private View mSelectedView;
-  private View mLocationView;
-
   private CountryAdapter adapter;
   private List<Country> countriesList;
   private List<Country> selectedCountriesList;
   private CountryPickerListener listener;
   private Country mSelectedCountry;
   private Country mLocationCountry;
-  private View mHeader;
   private Context context;
   private EditText mSearchEditText;
 
@@ -64,71 +58,32 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   @Override
   public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+    assert container != null;
     context = container.getContext();
     getAllCountries();
     View view = inflater.inflate(R.layout.country_picker, container, false);
     mSearchEditText = view.findViewById(R.id.country_code_picker_search);
-    countryListView = view.findViewById(R.id.country_code_picker_listview);
+    IndexFastScrollRecyclerView countryRv = view.findViewById(R.id.country_code_picker_rv);
     closeView = view.findViewById(R.id.close);
     closeView.setOnClickListener(this);
 
     selectedCountriesList = new ArrayList<>(countriesList.size());
     selectedCountriesList.addAll(countriesList);
 
-    mHeader = inflater.inflate(R.layout.list_header, null, false);
-    mSelectedView = mHeader.findViewById(R.id.selected_ll);
-    mLocationView = mHeader.findViewById(R.id.location_ll);
-    mSelectedTextView = mHeader.findViewById(R.id.selected_text);
-    TextView locationTextView = mHeader.findViewById(R.id.location_text);
-    mSelectedImageView = mHeader.findViewById(R.id.selected_icon);
-    ImageView locationImageView = mHeader.findViewById(R.id.location_icon);
-
     if (mSelectedCountry == null) {
       mSelectedCountry = mLocationCountry;
     }
 
-    if (mSelectedCountry != null) {
-      mSelectedTextView.setText(mSelectedCountry.getName());
-      mSelectedImageView.setImageResource(mSelectedCountry.getFlag());
-      mSelectedView.setOnClickListener(new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-          refreshCountryInfo(mSelectedCountry);
-        }
-      });
-    }
-    if (mLocationCountry != null) {
-      locationTextView.setText(mLocationCountry.getName());
-      locationImageView.setImageResource(mLocationCountry.getFlag());
-      mLocationView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          mSelectedCountry = mLocationCountry;
-          refreshCountryInfo(mSelectedCountry);
-        }
-      });
-    }
-
-    adapter = new CountryAdapter(requireActivity(), selectedCountriesList);
-    countryListView.addHeaderView(mHeader);
-    countryListView.setAdapter(adapter);
-    countryListView.setAreHeadersSticky(true);
-    countryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (listener != null) {
-          if (countryListView.getHeaderViewsCount() != 0 && position == 0) {
-            return;
-          }
-          Country country = selectedCountriesList.get(countryListView.getHeaderViewsCount() == 0
-                   ? position : position - 1);
-          mSelectedCountry = country;
-          refreshCountryInfo(country);
-        }
+    adapter = new CountryAdapter(selectedCountriesList, country -> {
+      if (listener != null) {
+        mSelectedCountry = country;
+        refreshCountryInfo(country);
       }
+      return null;
     });
+    countryRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+    countryRv.addItemDecoration(new StickyRecyclerHeadersDecoration(adapter));
+    countryRv.setAdapter(adapter);
 
     mSearchEditText.addTextChangedListener(new TextWatcher() {
 
@@ -150,8 +105,6 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   }
 
   private void refreshCountryInfo(Country country) {
-    mSelectedTextView.setText(country.getName());
-    mSelectedImageView.setImageResource(country.getFlag());
     reset();
     listener.onSelectCountry(country.getName(), country.getCode(), country.getDialCode(),
             country.getFlag());
@@ -161,17 +114,8 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     this.listener = listener;
   }
 
-  @SuppressLint("DefaultLocale")
+  @SuppressLint({"DefaultLocale", "NotifyDataSetChanged"})
   private void search(String text) {
-    if (!TextUtils.isEmpty(text)) {
-      if (countryListView.getHeaderViewsCount() != 0) {
-        countryListView.removeHeaderView(mHeader);
-      }
-    } else {
-      if (countryListView.getHeaderViewsCount() == 0) {
-        countryListView.addHeaderView(mHeader);
-      }
-    }
     selectedCountriesList.clear();
     for (Country country : countriesList) {
       if (country.getName().toLowerCase(Locale.ENGLISH).contains(text.toLowerCase())) {
@@ -211,9 +155,9 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     }
   }
 
-  private static String readEncodedJsonString() throws java.io.IOException {
+  private static String readEncodedJsonString() {
     byte[] data = Base64.decode(Constants.ENCODED_COUNTRY_CODE, Base64.DEFAULT);
-    return new String(data, "UTF-8");
+    return new String(data, StandardCharsets.UTF_8);
   }
 
   public void setCountriesList(List<Country> newCountries) {
@@ -234,8 +178,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
       return getCountry(telephonyManager.getSimCountryIso());
     }
 
-    Country c = getCountry(Locale.getDefault().getCountry());
-    return c;
+    return getCountry(Locale.getDefault().getCountry());
   }
 
   public Country getCountryByLocale( Context context, Locale locale ) {
@@ -297,6 +240,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     return country;
   }
 
+  @SuppressLint("DiscouragedApi")
   private int getFlagResId(String drawable) {
     try {
       return context.getResources()
@@ -311,7 +255,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   @Override public void onClick(View v) {
     if (v == closeView) {
       reset();
-      requireFragmentManager().popBackStackImmediate();
+      getParentFragmentManager().popBackStackImmediate();
     }
   }
 

@@ -64,11 +64,10 @@
       android:background="@color/bg_gray"
       />
 
-  <se.emilsjolander.stickylistheaders.StickyListHeadersListView
-      android:id="@+id/country_code_picker_listview"
+  <in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView
+      android:id="@+id/country_code_picker_rv"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:divider="@color/bg_gray"
-      android:layout_below="@+id/line"
-      />
+      android:layout_below="@+id/line" />
 </RelativeLayout>
