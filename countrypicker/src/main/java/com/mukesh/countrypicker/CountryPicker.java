@@ -118,7 +118,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   private void search(String text) {
     selectedCountriesList.clear();
     for (Country country : countriesList) {
-      if (country.getName().toLowerCase(Locale.ENGLISH).contains(text.toLowerCase())) {
+      if (country.getName().toLowerCase(Locale.ENGLISH).contains(text.toLowerCase()) || country.getDialCode().contains(text)) {
         selectedCountriesList.add(country);
       }
     }
