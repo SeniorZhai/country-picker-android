@@ -29,12 +29,17 @@ public class Country {
     return code;
   }
 
-  public void setCode(String code) {
+  public void setCode(String code, String countryName) {
     this.code = code;
     if (TextUtils.isEmpty(name)) {
-      name = new Locale("", code).getDisplayName();
-      englishName = new Locale("en", code).getDisplayName(Locale.ENGLISH);
-      englishName = englishName.substring(englishName.indexOf('(') + 1);
+      if (code.equals("BQ")) {
+        name = countryName;
+        englishName = countryName;
+      } else {
+        name = new Locale("", code).getDisplayName();
+        englishName = new Locale("en", code).getDisplayName(Locale.getDefault());
+        englishName = englishName.substring(englishName.indexOf('(') + 1);
+      }
     }
   }
 
