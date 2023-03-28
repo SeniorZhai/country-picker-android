@@ -138,7 +138,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
           String countryDialCode = jsonObject.getString("dial_code");
           String countryCode = jsonObject.getString("code");
           Country country = new Country();
-          country.setCode(countryCode, countryName);
+          country.setCode(countryCode);
           country.setDialCode(countryDialCode);
           country.setFlag(getFlagResId(countryCode));
           countriesList.add(country);
@@ -234,7 +234,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
 
   private Country afghanistan() {
     Country country = new Country();
-    country.setCode("AF", "Afghanistan");
+    country.setCode("AF");
     country.setDialCode("+93");
     country.setFlag(R.drawable.flag_af);
     return country;

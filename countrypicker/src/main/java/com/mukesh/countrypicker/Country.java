@@ -29,15 +29,19 @@ public class Country {
     return code;
   }
 
-  public void setCode(String code, String countryName) {
+  public void setCode(String code) {
     this.code = code;
     if (TextUtils.isEmpty(name)) {
       if (code.equals("BQ")) {
-        name = countryName;
-        englishName = countryName;
+        if (Locale.getDefault().getLanguage().contains("zh")) {
+          name = "博内尔、圣尤斯特歇斯和萨巴";
+        } else {
+          name = "Bonaire, Sint Eustatius and Saba";
+        }
+        englishName = "Bonaire, Sint Eustatius and Saba";
       } else {
-        name = new Locale("", code).getDisplayName();
-        englishName = new Locale("en", code).getDisplayName(Locale.getDefault());
+        name = new Locale("", code).getDisplayName(Locale.getDefault());
+        englishName = new Locale("en", code).getDisplayName(Locale.ENGLISH);
         englishName = englishName.substring(englishName.indexOf('(') + 1);
       }
     }
