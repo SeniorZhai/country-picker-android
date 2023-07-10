@@ -55,12 +55,18 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   public CountryPicker() {
   }
 
+  private final Country anonymous = new Country();
+
   @Override
   public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     assert container != null;
     context = container.getContext();
     getAllCountries();
+    anonymous.setName(getString(R.string.Mixin));
+    anonymous.setCode(getString(R.string.Mixin));
+    anonymous.setDialCode(getString(R.string.mixin_dial_code));
+    anonymous.setFlag(R.drawable.flag_mixin);
     View view = inflater.inflate(R.layout.country_picker, container, false);
     mSearchEditText = view.findViewById(R.id.country_code_picker_search);
     IndexFastScrollRecyclerView countryRv = view.findViewById(R.id.country_code_picker_rv);
@@ -84,6 +90,15 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     countryRv.setLayoutManager(new LinearLayoutManager(requireContext()));
     countryRv.addItemDecoration(new StickyRecyclerHeadersDecoration(adapter));
     countryRv.setAdapter(adapter);
+    View header = inflater.inflate(R.layout.header, container, false);
+    adapter.setHeaderView(header);
+    View mixinView = header.findViewById(R.id.mixin_rl);
+    mixinView.setOnClickListener(v -> {
+      if (listener != null) {
+        mSelectedCountry = anonymous;
+        refreshCountryInfo(anonymous);
+      }
+    });
 
     mSearchEditText.addTextChangedListener(new TextWatcher() {
 

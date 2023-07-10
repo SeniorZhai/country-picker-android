@@ -3,5 +3,7 @@
   <string name="search">Search&#8230;</string>
   <string name="no_sim_detected">No sim card detected.</string>
   <string name="title">Choose a Country or Region</string>
-  <string name="current_location">Current Location</string>
+  <string name="anonymous_number">Anonymous Number</string>
+  <string name="Mixin" translatable="false">Mixin</string>
+  <string name="mixin_dial_code" translatable="false">+XIN</string>
 </resources>

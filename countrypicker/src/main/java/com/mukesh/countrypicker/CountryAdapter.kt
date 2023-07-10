@@ -17,21 +17,25 @@ import kotlin.collections.ArrayList
 class CountryAdapter(
     private val countries: List<Country>,
     private val onClickListener: (Country) -> Unit
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), SectionIndexer, StickyRecyclerHeadersAdapter<HeaderViewHolder> {
+) : HeaderAdapter<RecyclerView.ViewHolder>(), SectionIndexer, StickyRecyclerHeadersAdapter<HeaderViewHolder> {
     private val sectionPositions = ArrayList<Int>(26)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun getNormalViewHolder(context: Context, parent: ViewGroup): NormalHolder {
         return CountryHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_normal, parent, false))
     }
 
-    override fun getHeaderId(position: Int): Long = countries[position].englishName[0].code.toLong()
+    override fun getHeaderId(position: Int): Long {
+        val pos = getPos(position)
+        if (pos == -1) return -1L
+        return countries[getPos(position)].englishName[0].code.toLong()
+    }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup): HeaderViewHolder {
         return HeaderViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_header, parent, false))
     }
 
     override fun onBindHeaderViewHolder(holder: HeaderViewHolder, position: Int) {
-        countries[position].let { holder.bind(it) }
+        countries[getPos(position)].let { holder.bind(it) }
     }
 
     override fun getItemCount() = countries.size
@@ -59,7 +63,7 @@ class CountryAdapter(
     override fun getSectionForPosition(position: Int): Int = 0
 }
 
-class CountryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class CountryHolder(itemView: View) : NormalHolder(itemView) {
     fun bind(country: Country, onClickListener: (Country) -> Unit) {
         val drawableName = "flag_" + country.code.lowercase(Locale.ENGLISH)
         val drawableId = itemView.context.resIdByName(drawableName, "drawable")
