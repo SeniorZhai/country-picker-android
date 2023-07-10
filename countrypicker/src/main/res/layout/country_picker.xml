@@ -11,9 +11,9 @@
   <ImageView
       android:id="@+id/close"
       android:layout_width="wrap_content"
-      android:minWidth="48dp"
-      android:layout_height="56dp"
+      android:layout_height="wrap_content"
       android:padding="8dp"
+      android:layout_marginTop="8dp"
       android:layout_marginStart="8dp"
       app:srcCompat="@drawable/ic_close_black_24dp"
       tools:ignore="ContentDescription"
@@ -30,19 +30,12 @@
       android:textColor="@android:color/black"
       android:textSize="18sp"
       />
-  <View
-      android:id="@+id/line1"
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:layout_below="@+id/close"
-      android:background="@color/bg_gray"
-      />
 
   <EditText
       android:id="@+id/country_code_picker_search"
       android:layout_width="match_parent"
       android:layout_height="50dp"
-      android:layout_below="@+id/line1"
+      android:layout_below="@+id/title"
       android:background="@null"
       android:drawablePadding="8dp"
       android:drawableStart="@drawable/ic_search"

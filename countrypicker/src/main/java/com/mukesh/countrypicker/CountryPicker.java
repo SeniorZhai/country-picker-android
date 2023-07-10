@@ -70,6 +70,9 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     View view = inflater.inflate(R.layout.country_picker, container, false);
     mSearchEditText = view.findViewById(R.id.country_code_picker_search);
     IndexFastScrollRecyclerView countryRv = view.findViewById(R.id.country_code_picker_rv);
+    countryRv.setIndexBarTransparentValue(0);
+    countryRv.setIndexBarStrokeVisibility(false);
+    countryRv.setIndexBarTextColor(R.color.text_blue);
     closeView = view.findViewById(R.id.close);
     closeView.setOnClickListener(this);
 
