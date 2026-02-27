@@ -12,8 +12,17 @@ import android.widget.TextView;
 import com.mukesh.countrypicker.Country;
 import com.mukesh.countrypicker.CountryPicker;
 import com.mukesh.countrypicker.CountryPickerListener;
+import com.mukeshsolanki.countrypickerexample.auth.AuthManager;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+
+  @Inject
+  AuthManager authManager;
 
   private TextView mCountryNameTextView, mCountryIsoCodeTextView, mCountryDialCodeTextView;
   private ImageView mCountryFlagImageView;
