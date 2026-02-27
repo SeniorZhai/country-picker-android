@@ -19,7 +19,7 @@ class AuthManager @Inject constructor(
     suspend fun login(username: String, password: String): Result<Account> {
         return try {
             val account = performLogin(username, password)
-            Session.saveAccount(account)
+            Session.storeAccount(account)
             sessionComponentManager.getOrCreateSessionComponent()
             Result.success(account)
         } catch (e: Exception) {

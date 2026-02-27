@@ -35,8 +35,9 @@ object Session {
 
     /**
      * Persists the account after a successful login.
+     * Calling this is the signal that login has completed.
      */
-    fun saveAccount(account: Account) {
+    fun storeAccount(account: Account) {
         val json = Json.encodeToString(account)
         sharedPreferences?.edit()?.putString(KEY_ACCOUNT, json)?.apply()
     }
