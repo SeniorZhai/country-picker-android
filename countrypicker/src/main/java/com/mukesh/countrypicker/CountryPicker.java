@@ -153,8 +153,11 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
   @SuppressLint({"DefaultLocale", "NotifyDataSetChanged"})
   private void search(String text) {
     selectedCountriesList.clear();
+    String lowerText = text.toLowerCase(Locale.ENGLISH);
     for (Country country : countriesList) {
-      if (country.getName().toLowerCase(Locale.ENGLISH).contains(text.toLowerCase()) || country.getDialCode().contains(text)) {
+      if (country.getName().toLowerCase(Locale.ENGLISH).contains(lowerText)
+          || country.getDialCode().toLowerCase(Locale.ENGLISH).contains(lowerText)
+          || country.getCode().toLowerCase(Locale.ENGLISH).contains(lowerText)) {
         selectedCountriesList.add(country);
       }
     }
