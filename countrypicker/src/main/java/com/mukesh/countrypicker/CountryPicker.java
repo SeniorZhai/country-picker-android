@@ -16,6 +16,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -152,6 +153,7 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
 
   @SuppressLint({"DefaultLocale", "NotifyDataSetChanged"})
   private void search(String text) {
+    Log.e("CountryPicker", text);
     selectedCountriesList.clear();
     for (Country country : countriesList) {
       if (country.getName().toLowerCase(Locale.ENGLISH).contains(text.toLowerCase()) || country.getName().equals(text) || country.getDialCode().contains(text)) {
