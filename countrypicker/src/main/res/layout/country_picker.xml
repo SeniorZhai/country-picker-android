@@ -2,12 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/country_picker_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
     >
+
+  <View
+      android:id="@+id/country_picker_top_space"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_alignParentTop="true"
+      />
 
   <ImageView
       android:id="@+id/close"
@@ -16,6 +22,7 @@
       android:padding="8dp"
       android:layout_marginTop="8dp"
       android:layout_marginStart="8dp"
+      android:layout_below="@+id/country_picker_top_space"
       app:srcCompat="@drawable/ic_close_black_24dp"
       tools:ignore="ContentDescription"
       />
@@ -25,6 +32,7 @@
       android:layout_width="wrap_content"
       android:layout_height="56dp"
       android:layout_centerHorizontal="true"
+      android:layout_below="@+id/country_picker_top_space"
       android:gravity="center"
       android:padding="8dp"
       android:text="@string/title"

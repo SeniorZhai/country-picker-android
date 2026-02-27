@@ -36,7 +36,8 @@ import in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView;
 @SuppressWarnings("unused")
 public class CountryPicker extends Fragment implements View.OnClickListener {
 
-  private View rootView;
+  private View topSpaceView;
+  private int topViewHeight = 0;
   private View closeView;
   private CountryAdapter adapter;
   private List<Country> countriesList;
@@ -69,7 +70,8 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     anonymous.setDialCode(getString(R.string.mixin_dial_code));
     anonymous.setFlag(R.drawable.flag_mixin);
     View view = inflater.inflate(R.layout.country_picker, container, false);
-    rootView = view.findViewById(R.id.country_picker_root);
+    topSpaceView = view.findViewById(R.id.country_picker_top_space);
+    applyTopViewHeight();
     mSearchEditText = view.findViewById(R.id.country_code_picker_search);
     IndexFastScrollRecyclerView countryRv = view.findViewById(R.id.country_code_picker_rv);
     countryRv.setIndexBarTransparentValue(0);
@@ -134,8 +136,18 @@ public class CountryPicker extends Fragment implements View.OnClickListener {
     this.listener = listener;
   }
 
-  public View getCountryPickerRootView() {
-    return rootView;
+  public void setTopViewHeight(int height) {
+    if (height < 0) return;
+    topViewHeight = height;
+    applyTopViewHeight();
+  }
+
+  private void applyTopViewHeight() {
+    if (topSpaceView != null && topViewHeight > 0) {
+      ViewGroup.LayoutParams params = topSpaceView.getLayoutParams();
+      params.height = topViewHeight;
+      topSpaceView.setLayoutParams(params);
+    }
   }
 
   @SuppressLint({"DefaultLocale", "NotifyDataSetChanged"})
